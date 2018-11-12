@@ -1,7 +1,7 @@
 /*!
  * chartjs-plugin-zoom
  * http://chartjs.org/
- * Version: 0.6.5
+ * Version: 0.6.6
  *
  * Copyright 2016 Evert Timberg
  * Released under the MIT license
@@ -209,6 +209,10 @@ function doZoom(chartInstance, zoom, center, whichAxes) {
 		});
 
 		chartInstance.update(0);
+
+		if (typeof zoomOptions.onZoom === 'function') {
+			zoomOptions.onZoom();
+		}
 	}
 }
 
@@ -283,6 +287,10 @@ function doPan(chartInstance, deltaX, deltaY) {
 		});
 
 		chartInstance.update(0);
+
+		if (typeof panOptions.onPan === 'function') {
+			panOptions.onPan();
+		}
 	}
 }
 
@@ -318,6 +326,8 @@ zoomNS.zoomCumulativeDelta = 0;
 
 // Chartjs Zoom Plugin
 var zoomPlugin = {
+	id: 'zoom',
+
 	afterInit: function(chartInstance) {
 		helpers.each(chartInstance.scales, function(scale) {
 			scale.originalOptions = helpers.clone(scale.options);
@@ -347,6 +357,7 @@ var zoomPlugin = {
 		};
 
 	},
+
 	beforeInit: function(chartInstance) {
 		chartInstance.zoom = {};
 
@@ -399,28 +410,28 @@ var zoomPlugin = {
 				}
 			};
 			node.addEventListener('mouseup', chartInstance.zoom._mouseUpHandler);
-		} else {
-			chartInstance.zoom._wheelHandler = function(event) {
-				var rect = event.target.getBoundingClientRect();
-				var offsetX = event.clientX - rect.left;
-				var offsetY = event.clientY - rect.top;
+		} 
+		
+		chartInstance.zoom._wheelHandler = function(event) {
+			var rect = event.target.getBoundingClientRect();
+			var offsetX = event.clientX - rect.left;
+			var offsetY = event.clientY - rect.top;
 
-				var center = {
-					x : offsetX,
-					y : offsetY
-				};
-
-				if (event.deltaY < 0) {
-					doZoom(chartInstance, 1.1, center);
-				} else {
-					doZoom(chartInstance, 0.909, center);
-				}
-				// Prevent the event from triggering the default behavior (eg. Content scrolling).
-				event.preventDefault();
+			var center = {
+				x : offsetX,
+				y : offsetY
 			};
 
-			node.addEventListener('wheel', chartInstance.zoom._wheelHandler);
-		}
+			if (event.deltaY < 0) {
+				doZoom(chartInstance, 1.1, center);
+			} else {
+				doZoom(chartInstance, 0.909, center);
+			}
+			// Prevent the event from triggering the default behavior (eg. Content scrolling).
+			event.preventDefault();
+		};
+
+		node.addEventListener('wheel', chartInstance.zoom._wheelHandler);
 
 		if (Hammer) {
 			var mc = new Hammer.Manager(node);
