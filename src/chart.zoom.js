@@ -398,28 +398,28 @@ var zoomPlugin = {
 				}
 			};
 			node.addEventListener('mouseup', chartInstance.zoom._mouseUpHandler);
-		} else {
-			chartInstance.zoom._wheelHandler = function(event) {
-				var rect = event.target.getBoundingClientRect();
-				var offsetX = event.clientX - rect.left;
-				var offsetY = event.clientY - rect.top;
+		} 
+		
+		chartInstance.zoom._wheelHandler = function(event) {
+			var rect = event.target.getBoundingClientRect();
+			var offsetX = event.clientX - rect.left;
+			var offsetY = event.clientY - rect.top;
 
-				var center = {
-					x : offsetX,
-					y : offsetY
-				};
-
-				if (event.deltaY < 0) {
-					doZoom(chartInstance, 1.1, center);
-				} else {
-					doZoom(chartInstance, 0.909, center);
-				}
-				// Prevent the event from triggering the default behavior (eg. Content scrolling).
-				event.preventDefault();
+			var center = {
+				x : offsetX,
+				y : offsetY
 			};
 
-			node.addEventListener('wheel', chartInstance.zoom._wheelHandler);
-		}
+			if (event.deltaY < 0) {
+				doZoom(chartInstance, 1.1, center);
+			} else {
+				doZoom(chartInstance, 0.909, center);
+			}
+			// Prevent the event from triggering the default behavior (eg. Content scrolling).
+			event.preventDefault();
+		};
+
+		node.addEventListener('wheel', chartInstance.zoom._wheelHandler);
 
 		if (Hammer) {
 			var mc = new Hammer.Manager(node);
